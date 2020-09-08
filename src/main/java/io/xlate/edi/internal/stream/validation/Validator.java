@@ -157,6 +157,17 @@ public class Validator {
         }
     }
 
+    private final Deque<HierarchicalLevel> levelStack = new ArrayDeque<>();
+
+    static class HierarchicalLevel {
+        final UsageNode reference;
+        String identifier;
+
+        HierarchicalLevel(UsageNode reference) {
+            this.reference = reference;
+        }
+    }
+
     public static Validator forSchema(Schema schema, Schema containerSchema, boolean validateCodeValues, boolean formatElements) {
         final Validator instance;
 
@@ -620,6 +631,10 @@ public class Validator {
         } else {
             loopStack.push(current);
             handler.loopBegin(current.getLink());
+        }
+
+        if ("HL".contentEquals(tag)) {
+            levelStack.push(new HierarchicalLevel(current));
         }
 
         correctSegment = segment = startLoop(current);
